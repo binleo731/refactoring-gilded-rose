@@ -25,32 +25,6 @@ class GildedRose {
         calculateQuality(item);
     }
 
-    private void calculateQuality(Item item) {
-        if (item.getSellIn() < 0) {
-            if (!item.getName().equals(AGED_BRIE)) {
-                if (!item.getName().equals(BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT)) {
-                    if (item.getQuality() > 0) {
-                        if (!item.getName().equals(SULFURAS_HAND_OF_RAGNAROS)) {
-                            item.setQuality(item.getQuality() - 1);
-                        }
-                    }
-                } else {
-                    item.setQuality(0);
-                }
-            } else {
-                if (isLessThanMaxQuality(item.getQuality())) {
-                    item.setQuality(item.getQuality() + 1);
-                }
-            }
-        }
-    }
-
-    private void initSellInWithName(Item item) {
-        if (!item.getName().equals(SULFURAS_HAND_OF_RAGNAROS)) {
-            item.setSellIn(item.getSellIn() - 1);
-        }
-    }
-
     private void initQualityWithName(Item item) {
         if (isSpecifyCommodity(item)) {
             increaseQuality(item);
@@ -59,21 +33,25 @@ class GildedRose {
         }
     }
 
+    private boolean isSpecifyCommodity(Item item) {
+        return item.getName().equals(AGED_BRIE)
+                && item.getName().equals(BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT);
+    }
+
     private void increaseQuality(Item item) {
         if (isLessThanMaxQuality(item.getQuality())) {
             item.setQuality(item.getQuality() + 1);
-            if (item.getName().equals(BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT)) {
-                if (item.getSellIn() < 11) {
-                    if (isLessThanMaxQuality(item.getQuality())) {
-                        item.setQuality(item.getQuality() + 1);
-                    }
-                }
+            increaseQualityWithSellIn(item);
+        }
+    }
 
-                if (item.getSellIn() < 6) {
-                    if (isLessThanMaxQuality(item.getQuality())) {
-                        item.setQuality(item.getQuality() + 1);
-                    }
-                }
+    private void increaseQualityWithSellIn(Item item) {
+        if (item.getName().equals(BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT)) {
+            if (item.getSellIn() < 11) {
+                item.setQuality(item.getQuality() + 1);
+            }
+            if (item.getSellIn() < 6) {
+                item.setQuality(item.getQuality() + 1);
             }
         }
     }
@@ -84,12 +62,34 @@ class GildedRose {
         }
     }
 
-    private boolean isLessThanMaxQuality(int quality) {
-        return quality < MAX_QUALITY;
+    private void initSellInWithName(Item item) {
+        if (!item.getName().equals(SULFURAS_HAND_OF_RAGNAROS)) {
+            item.setSellIn(item.getSellIn() - 1);
+        }
     }
 
-    private boolean isSpecifyCommodity(Item item) {
-        return item.getName().equals(AGED_BRIE)
-                && item.getName().equals(BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT);
+    private void calculateQuality(Item item) {
+        if (item.getSellIn() >= 0) {
+            return;
+        }
+        if (item.getName().equals(AGED_BRIE)) {
+            increaseQualityWhileLessThanMaxQuality(item);
+        } else if (item.getName().equals(BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT)) {
+            item.setQuality(0);
+        } else if (item.getQuality() > 0 && !item.getName().equals(SULFURAS_HAND_OF_RAGNAROS)) {
+            item.setQuality(item.getQuality() - 1);
+        }
+    }
+
+    private void increaseQualityWhileLessThanMaxQuality(Item item) {
+        if (isLessThanMaxQuality(item.getQuality())){
+            item.setQuality(item.getQuality() + 1);
+        }
+    }
+
+
+
+    private boolean isLessThanMaxQuality(int quality) {
+        return quality < MAX_QUALITY;
     }
 }
